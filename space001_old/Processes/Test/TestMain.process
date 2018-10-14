@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns="http://www.tibco.com/pe/DeployedVarsType" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>Processes/Test/TestMain.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startX>54</pd:startX>
+    <pd:startY>83</pd:startY>
+    <pd:returnBindings/>
+    <pd:endName>End</pd:endName>
+    <pd:endX>504</pd:endX>
+    <pd:endY>79</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <Group01>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="CreateDDL" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </Group01>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1539435162971</pd:targetNamespace>
+    <pd:activity name="CallCreateTable">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>307</pd:x>
+        <pd:y>85</pd:y>
+        <config>
+            <processName>/Processes/Test/CreateTable.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <TableName>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Group01/TableName"/>
+                </TableName>
+                <CreateDDL>
+                    <xsl:value-of select="$Group01/root/CreateDDL"/>
+                </CreateDDL>
+                <SchemaName>
+                    <xsl:value-of select="$_globalVariables/ns:GlobalVariables/Group01/SchemaName"/>
+                </SchemaName>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>176</pd:x>
+        <pd:y>85</pd:y>
+        <config>
+            <variableName>Group01</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <CreateDDL>
+                    <xsl:value-of select="&quot; create table TB_01 ( aaa varchar(1024) not null, bbb varchar(512), ccc int, primary key (aaa))&quot;"/>
+                </CreateDDL>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Assign</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CallCreateTable</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign</pd:from>
+        <pd:to>CallCreateTable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

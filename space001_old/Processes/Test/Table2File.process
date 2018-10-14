@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>Processes/Test/Table2File.process</pd:name>
+    <pd:startName>Timer</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="Timer">
+        <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
+        <pd:resourceType>ae.activities.timer</pd:resourceType>
+        <pd:x>45</pd:x>
+        <pd:y>47</pd:y>
+        <config>
+            <StartTime>1539517200000</StartTime>
+            <Frequency>false</Frequency>
+            <TimeInterval>10</TimeInterval>
+            <FrequencyIndex>Minute</FrequencyIndex>
+        </config>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>940</pd:endX>
+    <pd:endY>106</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <VG01>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="FileName" type="xsd:string"/>
+                        <xsd:element name="SelectFetchSize" type="xsd:int"/>
+                        <xsd:element name="SelectOffSet" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </VG01>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1539465364993</pd:targetNamespace>
+    <pd:activity name="Assign">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>63</pd:x>
+        <pd:y>184</pd:y>
+        <config>
+            <variableName>VG01</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <FileName>
+                    <xsl:value-of select="&quot;G:\Work\Table2File.txt&quot;"/>
+                </FileName>
+                <SelectFetchSize>
+                    <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/Group01/SelectFetchSize"/>
+                </SelectFetchSize>
+                <SelectOffSet>
+                    <xsl:value-of select="0"/>
+                </SelectOffSet>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Catch">
+        <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+        <pd:resourceType>ae.activities.catch</pd:resourceType>
+        <pd:x>936</pd:x>
+        <pd:y>261</pd:y>
+        <pd:handler>true</pd:handler>
+        <config>
+            <catchAll>true</catchAll>
+        </config>
+        <pd:inputBindings/>
+    </pd:activity>
+    <pd:group name="Group (1)">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>183</pd:x>
+        <pd:y>182</pd:y>
+        <pd:width>355</pd:width>
+        <pd:height>233</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>false</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>Read File</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Remove File</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Read File</pd:from>
+            <pd:to>end</pd:to>
+            <pd:xpathDescription>No File</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16776961</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Read-File/pfx:ReadActivityOutputNoContentClass/fileInfo/size &lt; 1</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch-1</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Read File</pd:from>
+            <pd:to>Remove File</pd:to>
+            <pd:xpathDescription>File Exist</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-65536</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$Read-File/pfx:ReadActivityOutputNoContentClass/fileInfo/size &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:activity name="Read File">
+            <pd:type>com.tibco.plugin.file.FileReadActivity</pd:type>
+            <pd:resourceType>ae.activities.FileReadActivity</pd:resourceType>
+            <pd:x>278</pd:x>
+            <pd:y>243</pd:y>
+            <config>
+                <encoding>text</encoding>
+                <excludeContent>true</excludeContent>
+            </config>
+            <pd:inputBindings>
+                <ns:ReadActivityInputClass>
+                    <fileName>
+                        <xsl:value-of select="$VG01/root/FileName"/>
+                    </fileName>
+                </ns:ReadActivityInputClass>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Remove File">
+            <pd:type>com.tibco.plugin.file.FileRemoveActivity</pd:type>
+            <pd:resourceType>ae.activities.FileRemoveActivity</pd:resourceType>
+            <pd:x>433</pd:x>
+            <pd:y>238</pd:y>
+            <config/>
+            <pd:inputBindings>
+                <pfx:RemoveActivityInputClass>
+                    <fileName>
+                        <xsl:value-of select="$VG01/root/FileName"/>
+                    </fileName>
+                </pfx:RemoveActivityInputClass>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Catch-1">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>317</pd:x>
+            <pd:y>336</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <fault>localname=FileNotFoundException namespace=http://schemas.tibco.com/bw/plugins/file/5.0/fileExceptions</fault>
+                <catchAll>true</catchAll>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="TruncateTargetTable">
+        <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
+        <pd:x>228</pd:x>
+        <pd:y>58</pd:y>
+        <config>
+            <timeout>0</timeout>
+            <commit>false</commit>
+            <maxRows>0</maxRows>
+            <jdbcSharedConfig>/Database/derby_TargetDB.sharedjdbc</jdbcSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <jdbcGeneralActivityInput>
+                <statement>
+                    <xsl:value-of select="&quot;truncate table TB_01&quot;"/>
+                </statement>
+            </jdbcGeneralActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="Assign-1">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>832</pd:x>
+        <pd:y>186</pd:y>
+        <config>
+            <variableName>VG01</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <FileName>
+                    <xsl:value-of select="$VG01/root/FileName"/>
+                </FileName>
+                <SelectFetchSize>
+                    <xsl:value-of select="$VG01/root/SelectFetchSize"/>
+                </SelectFetchSize>
+                <SelectOffSet>
+                    <xsl:value-of select="$updateCnt"/>
+                </SelectOffSet>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="UpdateGroup">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>340</pd:x>
+        <pd:y>37</pd:y>
+        <pd:width>295</pd:width>
+        <pd:height>229</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>repeat</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+            <pd:indexSlot>updateCnt</pd:indexSlot>
+            <pd:activityOutputName/>
+            <pd:repeatCondition>$SelectSourceTable/resultSet/lastSubset="true"</pd:repeatCondition>
+            <pd:accumulateOutput>false</pd:accumulateOutput>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>SelectSourceTable</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>JDBC Update</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SelectSourceTable</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>error</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SelectSourceTable</pd:from>
+            <pd:to>JDBC Update</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="JDBC Update">
+            <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+            <pd:x>431</pd:x>
+            <pd:y>191</pd:y>
+            <config>
+                <timeout>0</timeout>
+                <commit>false</commit>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>INSERT INTO TB_01(AAA, BBB, CCC) VALUES (?,?,?)</statement>
+                <jdbcSharedConfig>/Database/derby_TargetDB.sharedjdbc</jdbcSharedConfig>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>AAA</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>BBB</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                    <parameter>
+                        <parameterName>CCC</parameterName>
+                        <dataType>INTEGER</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+                <batchUpdate>true</batchUpdate>
+            </config>
+            <pd:inputBindings>
+                <jdbcUpdateActivityInput>
+                    <xsl:for-each select="$SelectSourceTable/resultSet/Record">
+                        <Record>
+                            <AAA>
+                                <xsl:value-of select="AAA"/>
+                            </AAA>
+                            <BBB>
+                                <xsl:value-of select="BBB"/>
+                            </BBB>
+                            <CCC>
+                                <xsl:value-of select="CCC"/>
+                            </CCC>
+                        </Record>
+                    </xsl:for-each>
+                </jdbcUpdateActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="SelectSourceTable">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>431</pd:x>
+            <pd:y>97</pd:y>
+            <config>
+                <timeout>0</timeout>
+                <commit>false</commit>
+                <maxRows>0</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <jdbcSharedConfig>/Database/derby_SourceDB.sharedjdbc</jdbcSharedConfig>
+                <statement>SELECT *
+FROM TB_01</statement>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>AAA</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>VARCHAR</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>BBB</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>VARCHAR</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <QueryOutputCachedSchemaColumns>CCC</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>INTEGER</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>OptionalElement</QueryOutputCachedSchemaStatus>
+                <processInSubsets>true</processInSubsets>
+                <Prepared_Param_DataType/>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <subsetSize>
+                        <xsl:value-of select="$VG01/root/SelectFetchSize"/>
+                    </subsetSize>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>Catch</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign</pd:from>
+        <pd:to>TruncateTargetTable</pd:to>
+        <pd:xpathDescription>Insert2Table</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$_globalVariables/pfx2:GlobalVariables/Group01/ExportFile="false"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign</pd:from>
+        <pd:to>Group (1)</pd:to>
+        <pd:xpathDescription>Export2File</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$_globalVariables/pfx2:GlobalVariables/Group01/ExportFile="true"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Group (1)</pd:from>
+        <pd:to>TruncateTargetTable</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Assign-1</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>UpdateGroup</pd:from>
+        <pd:to>Assign-1</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>TruncateTargetTable</pd:from>
+        <pd:to>UpdateGroup</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Timer</pd:from>
+        <pd:to>Assign</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

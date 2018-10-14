@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BWSharedResource>
+    <name>derby_TargetDB</name>
+    <resourceType>ae.shared.JDBCSharedResource</resourceType>
+    <config>
+        <driver>org.apache.derby.jdbc.ClientDriver</driver>
+        <maxConnections>10</maxConnections>
+        <loginTimeout>0</loginTimeout>
+        <connectionType>JDBC</connectionType>
+        <UseSharedJndiConfig>false</UseSharedJndiConfig>
+        <location>jdbc:derby://127.0.0.1:1528/TargetDB;create=true</location>
+        <user>user</user>
+        <password>#!BfeXQSXybE+opAB6O1Flw9WGxidQQzT6</password>
+    </config>
+</BWSharedResource>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Repository:repository xmlns:Repository="http://www.tibco.com/xmlns/repo/types/2002">
+    <enterpriseArchive>
+        <sharedArchive name="Shared Archive">
+            <resourceType>shared.archive.resource</resourceType>
+            <authorProperty>finegs</authorProperty>
+        </sharedArchive>
+        <processArchive name="Process Archive">
+            <resourceType>process.archive.resource</resourceType>
+            <authorProperty>finegs</authorProperty>
+            <processProperty>/Processes/Test/Table2File.process</processProperty>
+        </processArchive>
+        <versionProperty>4</versionProperty>
+        <authorProperty>finegs</authorProperty>
+        <addServiceSettableGvars>true</addServiceSettableGvars>
+        <name>space001_old</name>
+        <designer/>
+        <fileLocationProperty>G:\Dev\BW\workspace\deploy\space01_old.ear</fileLocationProperty>
+    </enterpriseArchive>
+</Repository:repository>

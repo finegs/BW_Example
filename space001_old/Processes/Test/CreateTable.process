@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>Processes/Test/CreateTable.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="TableName" type="xsd:string"/>
+                    <xsd:element name="CreateDDL" type="xsd:string"/>
+                    <xsd:element name="SchemaName" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>84</pd:startX>
+    <pd:startY>94</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <ResultRows>
+                <xsl:value-of select="count($SelectTableMeta/resultSet)"/>
+            </ResultRows>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="ResultRows" type="xsd:int"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>493</pd:endX>
+    <pd:endY>201</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables/>
+    <pd:targetNamespace>http://xmlns.example.com/1535168590024</pd:targetNamespace>
+    <pd:activity name="CreateTable">
+        <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
+        <pd:x>496</pd:x>
+        <pd:y>42</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <jdbcSharedConfig>/Database/derby_TargetDB.sharedjdbc</jdbcSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <jdbcGeneralActivityInput>
+                <statement>
+                    <xsl:value-of select="$Start/root/CreateDDL"/>
+                </statement>
+            </jdbcGeneralActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="SelectTableMeta">
+        <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+        <pd:x>255</pd:x>
+        <pd:y>107</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>100</maxRows>
+            <emptyStrAsNil>false</emptyStrAsNil>
+            <jdbcSharedConfig>/Database/derby_TargetDB.sharedjdbc</jdbcSharedConfig>
+            <statement> select 
+             a.tablename,
+             b.schemaname 
+from 
+              sys.systables a, 
+              sys.sysschemas b
+ where 
+	b.schemaname = ?
+        and 
+        b.schemaid = a.schemaid</statement>
+            <wizardData/>
+            <Prepared_Param_DataType>
+                <parameter>
+                    <parameterName>schemaname</parameterName>
+                    <dataType>VARCHAR</dataType>
+                </parameter>
+            </Prepared_Param_DataType>
+            <oraObjects/>
+            <oraTables/>
+            <QueryOutputCachedSchemaColumns>TABLENAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>VARCHAR</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            <QueryOutputCachedSchemaColumns>SCHEMANAME</QueryOutputCachedSchemaColumns>
+            <QueryOutputCachedSchemaDataTypes>12</QueryOutputCachedSchemaDataTypes>
+            <QueryOutputCachedSchemaDataTypesName>VARCHAR</QueryOutputCachedSchemaDataTypesName>
+            <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+        </config>
+        <pd:inputBindings>
+            <jdbcQueryActivityInput>
+                <schemaname>
+                    <xsl:value-of select="$Start/root/SchemaName"/>
+                </schemaname>
+            </jdbcQueryActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>CreateTable</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>SelectTableMeta</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SelectTableMeta</pd:from>
+        <pd:to>CreateTable</pd:to>
+        <pd:xpathDescription>TableDoes'tExist</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($SelectTableMeta/resultSet) &lt; 1</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>SelectTableMeta</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>count($SelectTableMeta/resultSet) &gt; 0</pd:xpath>
+    </pd:transition>
+</pd:ProcessDefinition>

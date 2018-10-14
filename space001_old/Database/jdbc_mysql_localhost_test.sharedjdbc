@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BWSharedResource>
+    <name>jdbc_mysql_localhost_test</name>
+    <resourceType>ae.shared.JDBCSharedResource</resourceType>
+    <config>
+        <driver>org.mariadb.jdbc.Driver</driver>
+        <maxConnections>10</maxConnections>
+        <loginTimeout>0</loginTimeout>
+        <connectionType>JDBC</connectionType>
+        <UseSharedJndiConfig>false</UseSharedJndiConfig>
+        <location>jdbc:mysql://127.0.0.1:3306/test</location>
+        <user>root</user>
+        <password>#!kn2Mls784qUFFmjYRa7YpJTC6QAW/XMC</password>
+    </config>
+</BWSharedResource>
