@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Repository:repository xmlns:Repository="http://www.tibco.com/xmlns/repo/types/2002">
+    <enterpriseArchive>
+        <sharedArchive name="Shared Archive">
+            <resourceType>shared.archive.resource</resourceType>
+            <authorProperty>user</authorProperty>
+        </sharedArchive>
+        <processArchive name="Process Archive">
+            <resourceType>process.archive.resource</resourceType>
+            <authorProperty>user</authorProperty>
+            <processProperty>/Processes/SELECT_TB_TEST_01.process</processProperty>
+        </processArchive>
+        <versionProperty>12</versionProperty>
+        <authorProperty>user</authorProperty>
+        <addServiceSettableGvars>true</addServiceSettableGvars>
+        <name>MyTest01</name>
+        <designer>
+            <lockedProperties/>
+            <fixedChildren/>
+            <resourceDescriptions/>
+        </designer>
+        <fileLocationProperty>D:\Dev\BW\workspace\deploy\MyTest01.ear</fileLocationProperty>
+    </enterpriseArchive>
+</Repository:repository>

@@ -1,0 +1,18 @@
+create PROCEDURE [dbo].[sp_name] as
+    -- Add the parameters for the stored procedure here
+BEGIN
+
+DECLARE @value INT;
+declare @count int;
+ SET @value = 0;
+ set @count=(select count(1) from new_table);
+ select @count;
+WHILE @value <1
+begin 
+insert into new_table
+select *,0 from old_table  where error=1
+order by id offset @count rows fetch next 1000 rows only
+
+SET @value = @value + 1;
+end;
+END;

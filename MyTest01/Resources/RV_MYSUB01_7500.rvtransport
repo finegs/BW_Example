@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BWSharedResource>
+    <config>
+        <workerWeight>1</workerWeight>
+        <workerTasks>10</workerTasks>
+        <workerCompleteTime>0</workerCompleteTime>
+        <schedulerWeight>1</schedulerWeight>
+        <scheduleHeartbeat>1.0</scheduleHeartbeat>
+        <scheduleActivation>3.5</scheduleActivation>
+        <showExpertSettings>reliable</showExpertSettings>
+        <daemon/>
+    </config>
+</BWSharedResource>

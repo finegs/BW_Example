@@ -1,0 +1,24 @@
+###### jdbc :  jdbc:derby://127.0.0.1:1527/D:\Dev\BW\workspace\derby_db\testdb;create=true
+
+
+1. DDL
+    CREATE TABLE TB_TEST_01 
+   ( A INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1) , 
+      NAME VARCHAR(256) NOT NULL, 
+      CONSTRAINT TB_TEST_01_PRI_KEY PRIMARY KEY (A) 
+   ) ;
+
+   CREATE TABLE TB_TEST_02 
+   ( A INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1) , 
+      NAME VARCHAR(256) NOT NULL, 
+      CONSTRAINT TB_TEST_02_PRI_KEY PRIMARY KEY (A) 
+   ) ;
+
+2. 
+      CALL SYSCS_UTIL.SYSCS_IMPORT_DATA_LOBS_FROM_EXTFILE ( null, 'TB_TEST_01', 'NAME',  '1', 'D:\Dev\BW\workspace\derby_db\tb_test_01.txt', ',', NULL,'UTF-8', 0);
+
+
+3. SELECT * FROM T ORDER BY I OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY
+
+4. insert into tb_test_02 select * from tb_test_01;
+

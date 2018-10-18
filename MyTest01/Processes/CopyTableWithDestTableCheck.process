@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns="http://www.tibco.com/pe/EngineTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tib="http://www.tibco.com/bw/xslt/custom-functions" xmlns:ns2="http://www.tibco.com/pe/WriteToLogActivitySchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <pd:name>Processes/CopyTableWithDestTableCheck.process</pd:name>
+    <pd:startName>onStartup</pd:startName>
+    <pd:startX>0</pd:startX>
+    <pd:startY>0</pd:startY>
+    <pd:returnBindings/>
+    <pd:starter name="onStartup">
+        <pd:type>com.tibco.pe.core.OnStartupEventSource</pd:type>
+        <pd:resourceType>ae.activities.onStartup</pd:resourceType>
+        <pd:x>68</pd:x>
+        <pd:y>145</pd:y>
+        <config/>
+        <pd:inputBindings/>
+    </pd:starter>
+    <pd:endName>End</pd:endName>
+    <pd:endX>1348</pd:endX>
+    <pd:endY>354</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <GPV01>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="DEST_TABLE_NAME" type="xsd:string"/>
+                        <xsd:element name="SOURCE_TABLE_NAME" type="xsd:string"/>
+                        <xsd:element name="DEST_TABLE_NAME_SIMPLE" type="xsd:string"/>
+                        <xsd:element name="errMsg" type="xsd:string"/>
+                        <xsd:element name="currentSelectOffset" type="xsd:int"/>
+                        <xsd:element name="insertFetchSize" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </GPV01>
+    </pd:processVariables>
+    <pd:partners/>
+    <pd:targetNamespace>http://xmlns.example.com/1536434250631</pd:targetNamespace>
+    <pd:activity name="initPVParams">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>101</pd:x>
+        <pd:y>353</pd:y>
+        <config>
+            <variableName>GPV01</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <DEST_TABLE_NAME>
+                    <xsl:value-of select="&quot;APP.TB_TEST_02&quot;"/>
+                </DEST_TABLE_NAME>
+                <SOURCE_TABLE_NAME>
+                    <xsl:value-of select="&quot;APP.TB_TEST_01&quot;"/>
+                </SOURCE_TABLE_NAME>
+                <DEST_TABLE_NAME_SIMPLE>
+                    <xsl:value-of select="&quot;TB_TEST_02&quot;"/>
+                </DEST_TABLE_NAME_SIMPLE>
+                <errMsg>
+                    <xsl:value-of select="&quot;&quot;"/>
+                </errMsg>
+                <currentSelectOffset>
+                    <xsl:value-of select="0"/>
+                </currentSelectOffset>
+                <insertFetchSize>
+                    <xsl:value-of select="10000"/>
+                </insertFetchSize>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:group name="mainGroup">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>211</pd:x>
+        <pd:y>39</pd:y>
+        <pd:width>783</pd:width>
+        <pd:height>587</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>checkDestTable</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>insertLoopGroup</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Log</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>checkDestTable</pd:from>
+            <pd:to>truncateDestTable</pd:to>
+            <pd:xpathDescription>DestTableExist</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$checkDestTable/resultSet/Record/CHECK_DEST_TBL_CNT &gt; 0</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>checkDestTable</pd:from>
+            <pd:to>createDestTableWitNoData</pd:to>
+            <pd:xpathDescription>DestTableDoesntExist</pd:xpathDescription>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>xpath</pd:conditionType>
+            <pd:xpath>$checkDestTable/resultSet/Record/CHECK_DEST_TBL_CNT &lt; 1</pd:xpath>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>truncateDestTable</pd:from>
+            <pd:to>dropDestTable</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>dropDestTable</pd:from>
+            <pd:to>createDestTableWitNoData</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch</pd:from>
+            <pd:to>Log</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>selectSourceRecordSize</pd:from>
+            <pd:to>insertLoopGroup</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>createDestTableWitNoData</pd:from>
+            <pd:to>initEachTurnInMainLoop</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>initEachTurnInMainLoop</pd:from>
+            <pd:to>selectSourceRecordSize</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="checkDestTable">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>280</pd:x>
+            <pd:y>107</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>SELECT COUNT(TABLENAME) CHECK_DEST_TBL_CNT 
+FROM SYS.SYSTABLES
+WHERE TABLENAME = ?</statement>
+                <jdbcSharedConfig>/Resources/jdbc_derby.sharedjdbc</jdbcSharedConfig>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>CHECK_DEST_TBL_CNT</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>INTEGER</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+                <Prepared_Param_DataType>
+                    <parameter>
+                        <parameterName>DEST_TABLE_NAME</parameterName>
+                        <dataType>VARCHAR</dataType>
+                    </parameter>
+                </Prepared_Param_DataType>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput>
+                    <DEST_TABLE_NAME>
+                        <xsl:value-of select="$GPV01/root/DEST_TABLE_NAME_SIMPLE"/>
+                    </DEST_TABLE_NAME>
+                </jdbcQueryActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="createDestTableWitNoData">
+            <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
+            <pd:x>506</pd:x>
+            <pd:y>125</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <jdbcSharedConfig>/Resources/jdbc_derby.sharedjdbc</jdbcSharedConfig>
+            </config>
+            <pd:inputBindings>
+                <jdbcGeneralActivityInput>
+                    <statement>
+                        <xsl:value-of select="concat(&quot;CREATE TABLE &quot;, $GPV01/root/DEST_TABLE_NAME, &quot; AS SELECT * FROM &quot;, $GPV01/root/SOURCE_TABLE_NAME, &quot; WITH NO DATA &quot;)"/>
+                    </statement>
+                </jdbcGeneralActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="truncateDestTable">
+            <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
+            <pd:x>329</pd:x>
+            <pd:y>251</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <jdbcSharedConfig>/Resources/jdbc_derby.sharedjdbc</jdbcSharedConfig>
+            </config>
+            <pd:inputBindings>
+                <jdbcGeneralActivityInput>
+                    <statement>
+                        <xsl:value-of select="concat(&quot;TRUNCATE TABLE &quot;, $GPV01/root/DEST_TABLE_NAME)"/>
+                    </statement>
+                </jdbcGeneralActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="dropDestTable">
+            <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
+            <pd:x>451</pd:x>
+            <pd:y>254</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <jdbcSharedConfig>/Resources/jdbc_derby.sharedjdbc</jdbcSharedConfig>
+            </config>
+            <pd:inputBindings>
+                <jdbcGeneralActivityInput>
+                    <statement>
+                        <xsl:value-of select="concat(&quot;DROP TABLE &quot;, $GPV01/root/DEST_TABLE_NAME)"/>
+                    </statement>
+                </jdbcGeneralActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="Catch">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>778</pd:x>
+            <pd:y>117</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <catchAll>true</catchAll>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Log">
+            <pd:type>com.tibco.pe.core.WriteToLogActivity</pd:type>
+            <pd:resourceType>ae.activities.log</pd:resourceType>
+            <pd:x>878</pd:x>
+            <pd:y>230</pd:y>
+            <config>
+                <role>User</role>
+            </config>
+            <pd:inputBindings>
+                <ns2:ActivityInput>
+                    <message>
+                        <xsl:value-of select="concat(string(tib:timestamp()), $Catch/exceptiondata/*)"/>
+                    </message>
+                    <xsl:if test="$_error/ns:ErrorReport/MsgCode">
+                        <msgCode>
+                            <xsl:value-of select="$_error/ns:ErrorReport/MsgCode"/>
+                        </msgCode>
+                    </xsl:if>
+                </ns2:ActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="selectSourceRecordSize">
+            <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
+            <pd:x>761</pd:x>
+            <pd:y>268</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <emptyStrAsNil>false</emptyStrAsNil>
+                <statement>select count(1) srcRecSize
+from APP.TB_TEST_01</statement>
+                <jdbcSharedConfig>/Resources/jdbc_derby.sharedjdbc</jdbcSharedConfig>
+                <wizardData/>
+                <Prepared_Param_DataType/>
+                <oraObjects/>
+                <oraTables/>
+                <QueryOutputCachedSchemaColumns>SRCRECSIZE</QueryOutputCachedSchemaColumns>
+                <QueryOutputCachedSchemaDataTypes>4</QueryOutputCachedSchemaDataTypes>
+                <QueryOutputCachedSchemaDataTypesName>INTEGER</QueryOutputCachedSchemaDataTypesName>
+                <QueryOutputCachedSchemaStatus>RequiredElement</QueryOutputCachedSchemaStatus>
+            </config>
+            <pd:inputBindings>
+                <jdbcQueryActivityInput/>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:group name="insertLoopGroup">
+            <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+            <pd:resourceType>ae.process.group</pd:resourceType>
+            <pd:x>366</pd:x>
+            <pd:y>388</pd:y>
+            <pd:width>466</pd:width>
+            <pd:height>166</pd:height>
+            <pd:collapsedWidth>57</pd:collapsedWidth>
+            <pd:collapsedHeight>70</pd:collapsedHeight>
+            <pd:groupVariables/>
+            <pd:joinToggle>inherit</pd:joinToggle>
+            <config>
+                <pd:groupType>while</pd:groupType>
+                <pd:serializable>false</pd:serializable>
+                <pd:indexSlot>i</pd:indexSlot>
+                <pd:activityOutputName/>
+                <pd:whileCondition>$GPV01/root/currentSelectOffset  &lt; $selectSourceRecordSize/resultSet/Record/SRCRECSIZE</pd:whileCondition>
+                <pd:accumulateOutput>false</pd:accumulateOutput>
+            </config>
+            <pd:inputBindings/>
+            <pd:expanded>true</pd:expanded>
+            <pd:transition>
+                <pd:from>start</pd:from>
+                <pd:to>insertWitchFetchSize</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>Assign</pd:from>
+                <pd:to>end</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:transition>
+                <pd:from>insertWitchFetchSize</pd:from>
+                <pd:to>Assign</pd:to>
+                <pd:lineType>Default</pd:lineType>
+                <pd:lineColor>-16777216</pd:lineColor>
+                <pd:conditionType>always</pd:conditionType>
+            </pd:transition>
+            <pd:activity name="insertWitchFetchSize">
+                <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
+                <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
+                <pd:x>487</pd:x>
+                <pd:y>478</pd:y>
+                <config>
+                    <timeout>10</timeout>
+                    <commit>false</commit>
+                    <emptyStrAsNil>false</emptyStrAsNil>
+                    <jdbcSharedConfig>/Resources/jdbc_derby.sharedjdbc</jdbcSharedConfig>
+                    <statement>insert into APP.TB_TEST_02  select * from APP.TB_TEST_01 offset ? rows  fetch next ? rows only
+</statement>
+                    <Prepared_Param_DataType>
+                        <parameter>
+                            <parameterName>CurrentSelectOffset</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                        <parameter>
+                            <parameterName>InsertFetchSize</parameterName>
+                            <dataType>INTEGER</dataType>
+                        </parameter>
+                    </Prepared_Param_DataType>
+                </config>
+                <pd:inputBindings>
+                    <jdbcUpdateActivityInput>
+                        <CurrentSelectOffset>
+                            <xsl:value-of select="$GPV01/root/currentSelectOffset"/>
+                        </CurrentSelectOffset>
+                        <InsertFetchSize>
+                            <xsl:value-of select="$GPV01/root/insertFetchSize"/>
+                        </InsertFetchSize>
+                    </jdbcUpdateActivityInput>
+                </pd:inputBindings>
+            </pd:activity>
+            <pd:activity name="Assign">
+                <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+                <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+                <pd:x>685</pd:x>
+                <pd:y>482</pd:y>
+                <config>
+                    <variableName>GPV01</variableName>
+                </config>
+                <pd:inputBindings>
+                    <root>
+                        <DEST_TABLE_NAME>
+                            <xsl:value-of select="$GPV01/root/DEST_TABLE_NAME"/>
+                        </DEST_TABLE_NAME>
+                        <SOURCE_TABLE_NAME>
+                            <xsl:value-of select="$GPV01/root/SOURCE_TABLE_NAME"/>
+                        </SOURCE_TABLE_NAME>
+                        <DEST_TABLE_NAME_SIMPLE>
+                            <xsl:value-of select="$GPV01/root/DEST_TABLE_NAME_SIMPLE"/>
+                        </DEST_TABLE_NAME_SIMPLE>
+                        <errMsg>
+                            <xsl:value-of select="$GPV01/root/errMsg"/>
+                        </errMsg>
+                        <currentSelectOffset>
+                            <xsl:value-of select="$GPV01/root/currentSelectOffset + $insertWitchFetchSize/jdbcUpdateActivityOutput/noOfUpdates"/>
+                        </currentSelectOffset>
+                        <insertFetchSize>
+                            <xsl:value-of select="$GPV01/root/insertFetchSize"/>
+                        </insertFetchSize>
+                    </root>
+                </pd:inputBindings>
+            </pd:activity>
+        </pd:group>
+        <pd:activity name="initEachTurnInMainLoop">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>612</pd:x>
+            <pd:y>264</pd:y>
+            <config>
+                <variableName>GPV01</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <DEST_TABLE_NAME>
+                        <xsl:value-of select="$GPV01/root/DEST_TABLE_NAME"/>
+                    </DEST_TABLE_NAME>
+                    <SOURCE_TABLE_NAME>
+                        <xsl:value-of select="$GPV01/root/SOURCE_TABLE_NAME"/>
+                    </SOURCE_TABLE_NAME>
+                    <DEST_TABLE_NAME_SIMPLE>
+                        <xsl:value-of select="$GPV01/root/DEST_TABLE_NAME_SIMPLE"/>
+                    </DEST_TABLE_NAME_SIMPLE>
+                    <errMsg>
+                        <xsl:value-of select="$GPV01/root/errMsg"/>
+                    </errMsg>
+                    <currentSelectOffset>
+                        <xsl:value-of select="0"/>
+                    </currentSelectOffset>
+                    <insertFetchSize>
+                        <xsl:value-of select="$GPV01/root/insertFetchSize"/>
+                    </insertFetchSize>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:transition>
+        <pd:from>onStartup</pd:from>
+        <pd:to>initPVParams</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>mainGroup</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>initPVParams</pd:from>
+        <pd:to>mainGroup</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>
