@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<serviceResource>
+<serviceResource xmlns:wsdl="http://xmlns.example.com/1539517361762">
+    <ns0:import xmlns:ns0="http://schemas.xmlsoap.org/wsdl/" namespace="http://xmlns.example.com/1539517361762" location="/Processes/Service.serviceagent"/>
     <config>
         <wsdl namespace="http://xmlns.example.com/1539517361762" embedWsdlComponents="true" embedSchemaComponents="true" embedJndiProperties="false"/>
         <class>com.tibco.bw.service.serviceAgent.ServiceServiceAgent</class>
@@ -8,5 +9,9 @@
             <row isDefault="true" groupName="Default"/>
         </groups>
         <DynamicCallProcesses/>
+        <name>Service</name>
+        <serviceChange>Thu Oct 18 21:16:22 KST 2018</serviceChange>
+        <interfaceImpl/>
+        <resourceType>service.definition</resourceType>
     </config>
 </serviceResource>

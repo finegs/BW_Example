@@ -1,0 +1,29 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<repository xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance" xmlns = "http://www.tibco.com/xmlns/repo/types/2002">
+	<globalVariables>
+		<globalVariable>
+			<name>CreateTargetTableDDL</name>
+			<value>create table TB_01 ( aaa varchar(1024) not null, bbb varchar(512), ccc int, primary key (aaa))</value>
+			<deploymentSettable>true</deploymentSettable>
+			<serviceSettable>false</serviceSettable>
+			<type>String</type>
+			<modTime>1539861876945</modTime>
+		</globalVariable>
+		<globalVariable>
+			<name>TableName</name>
+			<value>TB_01</value>
+			<deploymentSettable>true</deploymentSettable>
+			<serviceSettable>false</serviceSettable>
+			<type>String</type>
+			<modTime>1539860861533</modTime>
+		</globalVariable>
+		<globalVariable>
+			<name>TruncateTargetTable</name>
+			<value>"truncate table TB_01"</value>
+			<deploymentSettable>true</deploymentSettable>
+			<serviceSettable>false</serviceSettable>
+			<type>String</type>
+			<modTime>1539861877007</modTime>
+		</globalVariable>
+	</globalVariables>
+</repository>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BWSharedResource>
+    <name>oracle_HOST01</name>
+    <resourceType>ae.shared.JDBCSharedResource</resourceType>
+    <config>
+        <driver>oracle.jdbc.driver.OracleDriver (thin)</driver>
+        <maxConnections>10</maxConnections>
+        <loginTimeout>0</loginTimeout>
+        <connectionType>JDBC</connectionType>
+        <UseSharedJndiConfig>false</UseSharedJndiConfig>
+        <location>jdbc:oracle:thin:@HOST01:1522:orcl</location>
+        <user>hr</user>
+        <password>#!Oz+o+GxGVLl+ftDMdGufsu44kT4zEfkGOWJn+FfqChk=</password>
+    </config>
+</BWSharedResource>

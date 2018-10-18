@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pfx="http://www.tibco.com/namespaces/tnt/plugins/file" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:pfx2="http://www.tibco.com/pe/DeployedVarsType" xmlns:ns="http://www.tibco.com/namespaces/tnt/plugins/file/v2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <pd:name>Processes/Test/Table2File.process</pd:name>
+    <pd:name>Processes/Test/OracleTable2Table.process</pd:name>
     <pd:startName>Timer</pd:startName>
     <pd:startX>0</pd:startX>
     <pd:startY>0</pd:startY>
-    <pd:returnBindings/>
+    <pd:returnBindings>
+        <root>
+            <Insert2TagetCount>
+                <xsl:value-of select="$insert2TableCnt"/>
+            </Insert2TagetCount>
+            <IsSucces>
+                <xsl:value-of select="$VG01/root/ResultCode=1 and   $VG01/root/ErrorCode = 0"/>
+            </IsSucces>
+        </root>
+    </pd:returnBindings>
     <pd:starter name="Timer">
         <pd:type>com.tibco.plugin.timer.TimerEventSource</pd:type>
         <pd:resourceType>ae.activities.timer</pd:resourceType>
@@ -19,17 +28,30 @@
         <pd:inputBindings/>
     </pd:starter>
     <pd:endName>End</pd:endName>
-    <pd:endX>815</pd:endX>
-    <pd:endY>57</pd:endY>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="Insert2TagetCount" type="xsd:int"/>
+                    <xsd:element name="IsSucces" type="xsd:boolean"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>655</pd:endX>
+    <pd:endY>368</pd:endY>
     <pd:errorSchemas/>
     <pd:processVariables>
         <VG01>
             <xsd:element name="root">
                 <xsd:complexType>
                     <xsd:sequence>
-                        <xsd:element name="FileName" type="xsd:string"/>
-                        <xsd:element name="SelectFetchSize" type="xsd:int"/>
-                        <xsd:element name="SelectOffSet" type="xsd:int"/>
+                        <xsd:element name="SourceSelectFetchSize" type="xsd:int"/>
+                        <xsd:element name="SourceSelectOffSet" type="xsd:int"/>
+                        <xsd:element name="InsertTargetCount" type="xsd:int"/>
+                        <xsd:element name="ResultCode" type="xsd:int"/>
+                        <xsd:element name="ErrorCode" type="xsd:int"/>
+                        <xsd:element name="ErrorText" type="xsd:string"/>
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
@@ -39,30 +61,39 @@
     <pd:activity name="InitAssign">
         <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
         <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
-        <pd:x>46</pd:x>
-        <pd:y>167</pd:y>
+        <pd:x>102</pd:x>
+        <pd:y>258</pd:y>
         <config>
             <variableName>VG01</variableName>
         </config>
         <pd:inputBindings>
             <root>
-                <FileName>
-                    <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/Export/ExportFileName"/>
-                </FileName>
-                <SelectFetchSize>
+                <SourceSelectFetchSize>
                     <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/SelectFetchSize"/>
-                </SelectFetchSize>
-                <SelectOffSet>
+                </SourceSelectFetchSize>
+                <SourceSelectOffSet>
                     <xsl:value-of select="0"/>
-                </SelectOffSet>
+                </SourceSelectOffSet>
+                <InsertTargetCount>
+                    <xsl:value-of select="-1"/>
+                </InsertTargetCount>
+                <ResultCode>
+                    <xsl:value-of select="0"/>
+                </ResultCode>
+                <ErrorCode>
+                    <xsl:value-of select="0"/>
+                </ErrorCode>
+                <ErrorText>
+                    <xsl:value-of select="&quot;&quot;"/>
+                </ErrorText>
             </root>
         </pd:inputBindings>
     </pd:activity>
     <pd:activity name="CatchGlobal">
         <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
         <pd:resourceType>ae.activities.catch</pd:resourceType>
-        <pd:x>811</pd:x>
-        <pd:y>212</pd:y>
+        <pd:x>398</pd:x>
+        <pd:y>404</pd:y>
         <pd:handler>true</pd:handler>
         <config>
             <catchAll>true</catchAll>
@@ -72,8 +103,8 @@
     <pd:group name="Group (1)">
         <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
         <pd:resourceType>ae.process.group</pd:resourceType>
-        <pd:x>93</pd:x>
-        <pd:y>282</pd:y>
+        <pd:x>52</pd:x>
+        <pd:y>344</pd:y>
         <pd:width>355</pd:width>
         <pd:height>233</pd:height>
         <pd:collapsedWidth>57</pd:collapsedWidth>
@@ -110,7 +141,7 @@
             <pd:xpath>$Read-File/pfx:ReadActivityOutputNoContentClass/fileInfo/size &lt; 1</pd:xpath>
         </pd:transition>
         <pd:transition>
-            <pd:from>Catch-1</pd:from>
+            <pd:from>CatchExportFileGroup</pd:from>
             <pd:to>end</pd:to>
             <pd:lineType>Default</pd:lineType>
             <pd:lineColor>-16777216</pd:lineColor>
@@ -128,8 +159,8 @@
         <pd:activity name="Read File">
             <pd:type>com.tibco.plugin.file.FileReadActivity</pd:type>
             <pd:resourceType>ae.activities.FileReadActivity</pd:resourceType>
-            <pd:x>187</pd:x>
-            <pd:y>343</pd:y>
+            <pd:x>142</pd:x>
+            <pd:y>405</pd:y>
             <config>
                 <encoding>text</encoding>
                 <excludeContent>true</excludeContent>
@@ -137,7 +168,7 @@
             <pd:inputBindings>
                 <ns:ReadActivityInputClass>
                     <fileName>
-                        <xsl:value-of select="$VG01/root/FileName"/>
+                        <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/Export/ExportFileName"/>
                     </fileName>
                 </ns:ReadActivityInputClass>
             </pd:inputBindings>
@@ -145,22 +176,22 @@
         <pd:activity name="Remove File">
             <pd:type>com.tibco.plugin.file.FileRemoveActivity</pd:type>
             <pd:resourceType>ae.activities.FileRemoveActivity</pd:resourceType>
-            <pd:x>342</pd:x>
-            <pd:y>338</pd:y>
+            <pd:x>297</pd:x>
+            <pd:y>400</pd:y>
             <config/>
             <pd:inputBindings>
                 <pfx:RemoveActivityInputClass>
                     <fileName>
-                        <xsl:value-of select="$VG01/root/FileName"/>
+                        <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/Export/ExportFileName"/>
                     </fileName>
                 </pfx:RemoveActivityInputClass>
             </pd:inputBindings>
         </pd:activity>
-        <pd:activity name="Catch-1">
+        <pd:activity name="CatchExportFileGroup">
             <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
             <pd:resourceType>ae.activities.catch</pd:resourceType>
-            <pd:x>226</pd:x>
-            <pd:y>436</pd:y>
+            <pd:x>181</pd:x>
+            <pd:y>498</pd:y>
             <pd:handler>true</pd:handler>
             <config>
                 <fault>localname=FileNotFoundException namespace=http://schemas.tibco.com/bw/plugins/file/5.0/fileExceptions</fault>
@@ -172,8 +203,8 @@
     <pd:activity name="TruncateTargetTable">
         <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
         <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
-        <pd:x>248</pd:x>
-        <pd:y>184</pd:y>
+        <pd:x>217</pd:x>
+        <pd:y>382</pd:y>
         <config>
             <timeout>0</timeout>
             <commit>false</commit>
@@ -191,32 +222,41 @@
     <pd:activity name="CompleteAssign">
         <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
         <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
-        <pd:x>707</pd:x>
-        <pd:y>137</pd:y>
+        <pd:x>597</pd:x>
+        <pd:y>238</pd:y>
         <config>
             <variableName>VG01</variableName>
         </config>
         <pd:inputBindings>
             <root>
-                <FileName>
-                    <xsl:value-of select="$VG01/root/FileName"/>
-                </FileName>
-                <SelectFetchSize>
-                    <xsl:value-of select="$VG01/root/SelectFetchSize"/>
-                </SelectFetchSize>
-                <SelectOffSet>
-                    <xsl:value-of select="$updateCnt"/>
-                </SelectOffSet>
+                <SourceSelectFetchSize>
+                    <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/SelectFetchSize"/>
+                </SourceSelectFetchSize>
+                <SourceSelectOffSet>
+                    <xsl:value-of select="$insert2TableCnt"/>
+                </SourceSelectOffSet>
+                <InsertTargetCount>
+                    <xsl:value-of select="$insert2TableCnt"/>
+                </InsertTargetCount>
+                <ResultCode>
+                    <xsl:value-of select="0"/>
+                </ResultCode>
+                <ErrorCode>
+                    <xsl:value-of select="0"/>
+                </ErrorCode>
+                <ErrorText>
+                    <xsl:value-of select="&quot;Result is OK&quot;"/>
+                </ErrorText>
             </root>
         </pd:inputBindings>
     </pd:activity>
-    <pd:group name="UpdateGroup">
+    <pd:group name="Insert2TagetTableGroup">
         <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
         <pd:resourceType>ae.process.group</pd:resourceType>
-        <pd:x>340</pd:x>
-        <pd:y>37</pd:y>
-        <pd:width>295</pd:width>
-        <pd:height>276</pd:height>
+        <pd:x>304</pd:x>
+        <pd:y>8</pd:y>
+        <pd:width>227</pd:width>
+        <pd:height>249</pd:height>
         <pd:collapsedWidth>57</pd:collapsedWidth>
         <pd:collapsedHeight>70</pd:collapsedHeight>
         <pd:groupVariables/>
@@ -224,7 +264,7 @@
         <config>
             <pd:groupType>repeat</pd:groupType>
             <pd:serializable>false</pd:serializable>
-            <pd:indexSlot>updateCnt</pd:indexSlot>
+            <pd:indexSlot>insert2TableCnt</pd:indexSlot>
             <pd:activityOutputName/>
             <pd:repeatCondition>$SelectSourceTable/resultSet/lastSubset="true"</pd:repeatCondition>
             <pd:accumulateOutput>false</pd:accumulateOutput>
@@ -262,8 +302,8 @@
         <pd:activity name="Insert2TargetTable">
             <pd:type>com.tibco.plugin.jdbc.JDBCUpdateActivity</pd:type>
             <pd:resourceType>ae.activities.JDBCUpdateActivity</pd:resourceType>
-            <pd:x>484</pd:x>
-            <pd:y>224</pd:y>
+            <pd:x>409</pd:x>
+            <pd:y>175</pd:y>
             <config>
                 <timeout>0</timeout>
                 <commit>false</commit>
@@ -307,8 +347,8 @@
         <pd:activity name="SelectSourceTable">
             <pd:type>com.tibco.plugin.jdbc.JDBCQueryActivity</pd:type>
             <pd:resourceType>ae.activities.JDBCQueryActivity</pd:resourceType>
-            <pd:x>483</pd:x>
-            <pd:y>104</pd:y>
+            <pd:x>421</pd:x>
+            <pd:y>78</pd:y>
             <config>
                 <timeout>0</timeout>
                 <commit>false</commit>
@@ -342,21 +382,89 @@
             </pd:inputBindings>
         </pd:activity>
     </pd:group>
-    <pd:transition>
-        <pd:from>CatchGlobal</pd:from>
-        <pd:to>End</pd:to>
-        <pd:lineType>Default</pd:lineType>
-        <pd:lineColor>-16777216</pd:lineColor>
-        <pd:conditionType>always</pd:conditionType>
-    </pd:transition>
+    <pd:activity name="CreateTable">
+        <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
+        <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
+        <pd:x>233</pd:x>
+        <pd:y>250</pd:y>
+        <config>
+            <timeout>10</timeout>
+            <commit>false</commit>
+            <maxRows>1</maxRows>
+            <jdbcSharedConfig>/Database/oracle_HOST01.sharedjdbc</jdbcSharedConfig>
+        </config>
+        <pd:inputBindings>
+            <jdbcGeneralActivityInput>
+                <statement>
+                    <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/Target/CreateTargetTableDDL"/>
+                </statement>
+            </jdbcGeneralActivityInput>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="CallCheckTableExist">
+        <pd:type>com.tibco.pe.core.CallProcessActivity</pd:type>
+        <pd:resourceType>ae.process.subprocess</pd:resourceType>
+        <pd:x>58</pd:x>
+        <pd:y>165</pd:y>
+        <config>
+            <processName>/Processes/Test/checkTableExist.process</processName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <TableName>
+                    <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/Target/TableName"/>
+                </TableName>
+                <checkDML>
+                    <xsl:value-of select="concat(&quot;select count(1) from &quot;,  $_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/Target/TableName)"/>
+                </checkDML>
+                <deleteDDL>
+                    <xsl:value-of select="concat(&quot;drop table &quot;, $_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/Target/TableName)"/>
+                </deleteDDL>
+                <createDDL>
+                    <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/Target/CreateTargetTableDDL"/>
+                </createDDL>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:activity name="FailAssign">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>514</pd:x>
+        <pd:y>369</pd:y>
+        <config>
+            <variableName>VG01</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <SourceSelectFetchSize>
+                    <xsl:value-of select="$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/SelectFetchSize"/>
+                </SourceSelectFetchSize>
+                <SourceSelectOffSet>
+                    <xsl:value-of select="$insert2TableCnt"/>
+                </SourceSelectOffSet>
+                <InsertTargetCount>
+                    <xsl:value-of select="$insert2TableCnt"/>
+                </InsertTargetCount>
+                <ResultCode>
+                    <xsl:value-of select="-1"/>
+                </ResultCode>
+                <ErrorCode>
+                    <xsl:value-of select="-3"/>
+                </ErrorCode>
+                <ErrorText>
+                    <xsl:value-of select="&quot;Catch Global Exception&quot;"/>
+                </ErrorText>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
     <pd:transition>
         <pd:from>InitAssign</pd:from>
         <pd:to>TruncateTargetTable</pd:to>
-        <pd:xpathDescription>Insert2Table</pd:xpathDescription>
+        <pd:xpathDescription>TableExist</pd:xpathDescription>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
         <pd:conditionType>xpath</pd:conditionType>
-        <pd:xpath>$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/ExportFile="false"</pd:xpath>
+        <pd:xpath>$CallCheckTableExist/root/isTableExist="true"</pd:xpath>
     </pd:transition>
     <pd:transition>
         <pd:from>InitAssign</pd:from>
@@ -365,7 +473,7 @@
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
         <pd:conditionType>xpath</pd:conditionType>
-        <pd:xpath>$_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/ExportFile="true"</pd:xpath>
+        <pd:xpath>($_globalVariables/pfx2:GlobalVariables/_procG_OracleTable2Table/ExportFile="true") and $CallCheckTableExist/root/isTableExist = "true"</pd:xpath>
     </pd:transition>
     <pd:transition>
         <pd:from>Group (1)</pd:from>
@@ -382,7 +490,7 @@
         <pd:conditionType>always</pd:conditionType>
     </pd:transition>
     <pd:transition>
-        <pd:from>UpdateGroup</pd:from>
+        <pd:from>Insert2TagetTableGroup</pd:from>
         <pd:to>CompleteAssign</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
@@ -390,14 +498,51 @@
     </pd:transition>
     <pd:transition>
         <pd:from>TruncateTargetTable</pd:from>
-        <pd:to>UpdateGroup</pd:to>
+        <pd:to>Insert2TagetTableGroup</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
         <pd:conditionType>always</pd:conditionType>
     </pd:transition>
     <pd:transition>
         <pd:from>Timer</pd:from>
+        <pd:to>CallCheckTableExist</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>InitAssign</pd:from>
+        <pd:to>CreateTable</pd:to>
+        <pd:xpathDescription>NoTable</pd:xpathDescription>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>xpath</pd:conditionType>
+        <pd:xpath>$CallCheckTableExist/root/isTableExist="false"</pd:xpath>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CreateTable</pd:from>
+        <pd:to>Insert2TagetTableGroup</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CallCheckTableExist</pd:from>
         <pd:to>InitAssign</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>CatchGlobal</pd:from>
+        <pd:to>FailAssign</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>FailAssign</pd:from>
+        <pd:to>End</pd:to>
         <pd:lineType>Default</pd:lineType>
         <pd:lineColor>-16777216</pd:lineColor>
         <pd:conditionType>always</pd:conditionType>

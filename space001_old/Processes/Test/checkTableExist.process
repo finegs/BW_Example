@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pd:ProcessDefinition xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:pd="http://xmlns.tibco.com/bw/process/2003" xmlns:ns="http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <pd:name>Processes/Test/checkTableExist.process</pd:name>
+    <pd:startName>Start</pd:startName>
+    <pd:startType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="TableName" type="xsd:string"/>
+                    <xsd:element name="checkDML" type="xsd:string"/>
+                    <xsd:element name="deleteDDL" type="xsd:string"/>
+                    <xsd:element name="createDDL" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:startType>
+    <pd:startX>48</pd:startX>
+    <pd:startY>56</pd:startY>
+    <pd:returnBindings>
+        <root>
+            <isExitNeed>
+                <xsl:value-of select="$CheckTableExist/root/isTableExist"/>
+            </isExitNeed>
+            <isTableExist>
+                <xsl:value-of select="$CheckTableExist/root/isExitNeed"/>
+            </isTableExist>
+        </root>
+    </pd:returnBindings>
+    <pd:endName>End</pd:endName>
+    <pd:endType>
+        <xsd:element name="root">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="isExitNeed" type="xsd:boolean"/>
+                    <xsd:element name="isTableExist" type="xsd:boolean"/>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+    </pd:endType>
+    <pd:endX>659</pd:endX>
+    <pd:endY>189</pd:endY>
+    <pd:errorSchemas/>
+    <pd:processVariables>
+        <CheckTableExist>
+            <xsd:element name="root">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="TableName" type="xsd:string"/>
+                        <xsd:element name="isTableExist" type="xsd:boolean"/>
+                        <xsd:element name="isExitNeed" type="xsd:boolean"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </CheckTableExist>
+    </pd:processVariables>
+    <pd:targetNamespace>http://xmlns.example.com/1539779777254</pd:targetNamespace>
+    <pd:group name="TryCatchGroup">
+        <pd:type>com.tibco.pe.core.LoopGroup</pd:type>
+        <pd:resourceType>ae.process.group</pd:resourceType>
+        <pd:x>167</pd:x>
+        <pd:y>26</pd:y>
+        <pd:width>376</pd:width>
+        <pd:height>305</pd:height>
+        <pd:collapsedWidth>57</pd:collapsedWidth>
+        <pd:collapsedHeight>70</pd:collapsedHeight>
+        <pd:groupVariables/>
+        <pd:joinToggle>inherit</pd:joinToggle>
+        <config>
+            <pd:groupType>simpleGroup</pd:groupType>
+            <pd:serializable>false</pd:serializable>
+        </config>
+        <pd:inputBindings/>
+        <pd:expanded>true</pd:expanded>
+        <pd:transition>
+            <pd:from>start</pd:from>
+            <pd:to>executeCheckDML</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Assign</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>executeCheckDML</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>SetOtherError</pd:from>
+            <pd:to>end</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch_ORA00942</pd:from>
+            <pd:to>Assign</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:transition>
+            <pd:from>Catch-Others</pd:from>
+            <pd:to>SetOtherError</pd:to>
+            <pd:lineType>Default</pd:lineType>
+            <pd:lineColor>-16777216</pd:lineColor>
+            <pd:conditionType>always</pd:conditionType>
+        </pd:transition>
+        <pd:activity name="Catch_ORA00942">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>307</pd:x>
+            <pd:y>173</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <fault>localname=JDBCSQLException namespace=http://schemas.tibco.com/bw/plugins/jdbc/5.0/jdbcExceptions</fault>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Catch-Others">
+            <pd:type>com.tibco.pe.core.CatchActivity</pd:type>
+            <pd:resourceType>ae.activities.catch</pd:resourceType>
+            <pd:x>300</pd:x>
+            <pd:y>253</pd:y>
+            <pd:handler>true</pd:handler>
+            <config>
+                <catchAll>true</catchAll>
+            </config>
+            <pd:inputBindings/>
+        </pd:activity>
+        <pd:activity name="Assign">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>421</pd:x>
+            <pd:y>172</pd:y>
+            <config>
+                <variableName>CheckTableExist</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <TableName>
+                        <xsl:value-of select="$Start/root/TableName"/>
+                    </TableName>
+                    <isTableExist>
+                        <xsl:value-of select="$Catch_ORA00942/ns:JDBCSQLException/msgCode =942"/>
+                    </isTableExist>
+                    <isExitNeed>
+                        <xsl:value-of select="&quot;false&quot;"/>
+                    </isExitNeed>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="SetOtherError">
+            <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+            <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+            <pd:x>422</pd:x>
+            <pd:y>254</pd:y>
+            <config>
+                <variableName>CheckTableExist</variableName>
+            </config>
+            <pd:inputBindings>
+                <root>
+                    <TableName>
+                        <xsl:value-of select="$Start/root/TableName"/>
+                    </TableName>
+                    <isTableExist>
+                        <xsl:value-of select="&quot;false&quot;"/>
+                    </isTableExist>
+                    <isExitNeed>
+                        <xsl:value-of select="&quot;true&quot;"/>
+                    </isExitNeed>
+                </root>
+            </pd:inputBindings>
+        </pd:activity>
+        <pd:activity name="executeCheckDML">
+            <pd:type>com.tibco.plugin.jdbc.JDBCGeneralActivity</pd:type>
+            <pd:resourceType>ae.activities.JDBCGeneralActivity</pd:resourceType>
+            <pd:x>360</pd:x>
+            <pd:y>98</pd:y>
+            <config>
+                <timeout>10</timeout>
+                <commit>false</commit>
+                <maxRows>100</maxRows>
+                <jdbcSharedConfig>/Database/oracle_HOST01.sharedjdbc</jdbcSharedConfig>
+            </config>
+            <pd:inputBindings>
+                <jdbcGeneralActivityInput>
+                    <statement>
+                        <xsl:value-of select="$Start/root/checkDML"/>
+                    </statement>
+                    <maxRows>
+                        <xsl:value-of select="1"/>
+                    </maxRows>
+                </jdbcGeneralActivityInput>
+            </pd:inputBindings>
+        </pd:activity>
+    </pd:group>
+    <pd:activity name="Init">
+        <pd:type>com.tibco.pe.core.AssignActivity</pd:type>
+        <pd:resourceType>ae.activities.assignActivity</pd:resourceType>
+        <pd:x>54</pd:x>
+        <pd:y>188</pd:y>
+        <config>
+            <variableName>CheckTableExist</variableName>
+        </config>
+        <pd:inputBindings>
+            <root>
+                <TableName>
+                    <xsl:value-of select="$Start/root/TableName"/>
+                </TableName>
+                <isTableExist>
+                    <xsl:value-of select="&quot;true&quot;"/>
+                </isTableExist>
+                <isExitNeed>
+                    <xsl:value-of select="&quot;false&quot;"/>
+                </isExitNeed>
+            </root>
+        </pd:inputBindings>
+    </pd:activity>
+    <pd:transition>
+        <pd:from>Start</pd:from>
+        <pd:to>Init</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>TryCatchGroup</pd:from>
+        <pd:to>End</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+    <pd:transition>
+        <pd:from>Init</pd:from>
+        <pd:to>TryCatchGroup</pd:to>
+        <pd:lineType>Default</pd:lineType>
+        <pd:lineColor>-16777216</pd:lineColor>
+        <pd:conditionType>always</pd:conditionType>
+    </pd:transition>
+</pd:ProcessDefinition>

@@ -1,0 +1,31 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<repository xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance" xmlns = "http://www.tibco.com/xmlns/repo/types/2002">
+	<globalVariables>
+		<globalVariable>
+			<name>ExportFile</name>
+			<value>false</value>
+			<deploymentSettable>true</deploymentSettable>
+			<serviceSettable>false</serviceSettable>
+			<type>Boolean</type>
+			<constraint></constraint>
+			<modTime>1539860383910</modTime>
+		</globalVariable>
+		<globalVariable>
+			<name>SchemaName</name>
+			<value>user</value>
+			<deploymentSettable>true</deploymentSettable>
+			<serviceSettable>false</serviceSettable>
+			<type>String</type>
+			<modTime>1539860383941</modTime>
+		</globalVariable>
+		<globalVariable>
+			<name>SelectFetchSize</name>
+			<value>1000</value>
+			<description></description>
+			<deploymentSettable>true</deploymentSettable>
+			<serviceSettable>false</serviceSettable>
+			<type>Integer</type>
+			<modTime>1539860861486</modTime>
+		</globalVariable>
+	</globalVariables>
+</repository>
